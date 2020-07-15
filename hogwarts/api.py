@@ -38,7 +38,7 @@ def add_new_student():
     Validations.validate_admin(admin_data, data_layer)
     Validations.validate_add_new_user(student_data)
     data_layer.create_new_student(student_data)
-    return app.response_class(response=json.dumps({"message": "{} was created".format(student_data["email"]) }), status=200, mimetype="application/json")
+    return app.response_class(response=json.dumps({"message": "{} was created".format(student_data["email"])}), status=200, mimetype="application/json")
 
 
 @app.route("/student/login", methods=["POST"])
@@ -79,14 +79,35 @@ def get_students_by_added_date():
 
 @app.route("/desire")
 def get_count_of_desired_skill():
-    skill = request.get("skill")
-    pass
+    skill = request.args.get("skill")
+    count = data_layer.get_count_of_desired_skills(skill)
+    return app.response_class(response=json.dumps({skill: count}), status=200, mimetype="application/json")
 
 
 @app.route("/have")
-def get_count_of_skill():
-    skill = request.get("skill")
-    pass
+def get_count_of_existing_skill():
+    skill = request.args.get("skill")
+    count = data_layer.get_count_of_existing_skills(skill)
+    return app.response_class(response=json.dumps({skill: count}), status=200, mimetype="application/json")
+
+
+@app.route("/desire", methods=["POST"])
+def add_desired_skill():
+    data = request.json
+    Validations.validate_email_existing(data["email"], data_layer._students)
+    Validations.validate_email_format(data["email"])
+    data_layer.add_desired_skill_by_email(data)
+    return app.response_class(response=json.dumps({"message": "{} level {} was added to {}".format(data["skill"]["name"], data["skill"]["level"], data["email"])}), status=200, mimetype="application/json")
+
+
+@app.route("/have", methods=["POST"])
+def add_existing_skill():
+    data = request.json
+    Validations.validate_email_existing(data["email"], data_layer._students)
+    Validations.validate_email_format(data["email"])
+    data_layer.add_existing_skill_by_email(data)
+    return app.response_class(response=json.dumps({"message": "{} level {} was added to {}".format(
+        data["skill"]["name"], data["skill"]["level"], data["email"])}), status=200, mimetype="application/json")
 
 
 if __name__ == "__main__":

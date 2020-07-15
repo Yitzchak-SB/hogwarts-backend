@@ -36,6 +36,18 @@ class Validations:
         return True
 
     @staticmethod
+    def validate_email_existing(email, users_pool):
+        if email not in users_pool:
+            raise ValueError("User does not exist")
+        return True
+
+    @staticmethod
+    def validate_email_duplicate(data, users_pool):
+        if data["email"] in users_pool:
+            raise ValueError("User already exists")
+        return True
+
+    @staticmethod
     def validate_student_by_email(email):
         if not email or not Validations.validate_email_format(email):
             raise ValueError("email is not Valid")

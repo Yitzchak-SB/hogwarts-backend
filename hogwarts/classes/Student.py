@@ -4,18 +4,23 @@ from classes.Skill import Skill
 
 
 class Student(Person):
-    def __init__(self, id, first_name, last_name, email, password, existing_magic_skills=[], desired_magic_skills=[]):
+    def __init__(self, id, first_name, last_name, email, password, existing_magic_skills={}, desired_magic_skills={}):
         Person.__init__(self, id, first_name, last_name, email, password)
         self.existing_magic_skills = existing_magic_skills
         self.desired_magic_skills = desired_magic_skills
 
     def add_existing_skills(self, name, level):
         skill = Skill(name, level)
-        self.existing_magic_skills.append(skill)
+        self.existing_magic_skills[name] = skill.__dict__
+        if name in self.desired_magic_skills and self.desired_magic_skills[name]["level"]:
+            if self.existing_magic_skills[name]["level"] >= 5:
+                del self.desired_magic_skills[name]
+                return
+            self.desired_magic_skills[name]["level"] += 1
 
     def add_desired_skills(self, name, level):
         skill = Skill(name, level)
-        self.desired_magic_skills.append(skill)
+        self.desired_magic_skills[name] = skill.__dict__
 
     def __str__(self):
         return json.dumps(self.__dict__)

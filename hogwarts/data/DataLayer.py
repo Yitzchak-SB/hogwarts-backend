@@ -11,6 +11,7 @@ class DataLayer:
 
     def get_student_by_email(self, email):
         student = self._students[email]
+        student.edit_update_time()
         return student.__dict__
 
     def create_new_student(self, student_data):
@@ -20,6 +21,7 @@ class DataLayer:
 
     def set_student_by_email(self, new_student_data):
         for key in new_student_data:
+            self._students[new_student_data["email"]].edit_update_time()
             if key == "id":
                 self._students[new_student_data["email"]].set_id(new_student_data["id"])
             elif key == "first_name":
@@ -66,3 +68,32 @@ class DataLayer:
             for key in admins_data:
                 admin = Admin(admins_data[key]["id"], admins_data[key]["first_name"], admins_data[key]["last_name"], admins_data[key]["email"], admins_data[key]["password"])
                 self._admins[admins_data[key]["email"]] = admin
+
+    def get_count_of_existing_skills(self, skill):
+        count = 0
+        students_pool = self.get_all_students()
+        for key in students_pool:
+            for name in students_pool[key]["existing_magic_skills"]:
+                if skill == name:
+                    count += 1
+        return count
+
+    def get_count_of_desired_skills(self, skill):
+        count = 0
+        students_pool = self.get_all_students()
+        for key in students_pool:
+            for name in students_pool[key]["desired_magic_skills"]:
+                if skill == name:
+                    count += 1
+        return count
+
+    def add_existing_skill_by_email(self, data):
+        student = self._students[data["email"]]
+        student.add_existing_skills(data["skill"]["name"], data["skill"]["level"])
+        student.edit_update_time()
+
+    def add_desired_skill_by_email(self, data):
+        student = self._students[data["email"]]
+        student.add_desired_skills(data["skill"]["name"], data["skill"]["level"])
+        student.edit_update_time()
+

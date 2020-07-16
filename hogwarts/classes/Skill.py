@@ -7,4 +7,4 @@ class Skill:
         self.level = level
 
     def __str__(self):
-        return json.dumps(self.__dict__)
+        return json.dumps({self.name: self.__dict__})

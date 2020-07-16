@@ -1,1 +1,122 @@
-{"noam1563@gmail.com": {"email": "noam1563@gmail.com", "password": "12345678", "first_name": "Noam", "last_name": "Siegel", "id":  "11112", "existing_magic_skills": {}, "desired_magic_skills": {}}, "odelia131@gmail.com": {"email": "odelia131@gmail.com", "password": "12345678", "first_name": "Odelia", "last_name": "Siegel-Bareket", "id":  "11113", "existing_magic_skills": {}, "desired_magic_skills": {}}, "tryme@try.me": {"email": "tryme@try.me", "password": "try123me", "first_name": "try", "last_name": "me", "id":  "11114", "existing_magic_skills": {}, "desired_magic_skills": {}}, "yitz@itc.tech": {"email": "yitz@itc.tech", "password": "yitz1234", "first_name": "yitz", "last_name": "shpitz", "id":  "11115", "existing_magic_skills": {}, "desired_magic_skills": {} }, "naomi@kids.com": {"email": "naomi@kids.com", "password": "neyney19", "first_name": "naomi", "last_name": "siegel bareket", "id":  "11116", "existing_magic_skills": {}, "desired_magic_skills": {} }, "nini@kids.com": {"email": "nini@kids.com", "password": "nini2020", "first_name": "nini", "last_name": "banini", "id":  "11117", "existing_magic_skills": {}, "desired_magic_skills": {} }, "go@try.me": {"email": "go@try.me", "password": "12345678", "first_name": "go", "last_name": "try me", "id":  "11118", "existing_magic_skills": {}, "desired_magic_skills": {} }, "odish@siegel.com": {"email": "odish@siegel.com", "password": "77777777", "first_name": "odish", "last_name": "siegel", "id":  "11119", "existing_magic_skills": {}, "desired_magic_skills": {} }, "daniel@bareket.co.il": {"email": "daniel@bareket.co.il", "password": "dani1234", "first_name": "daniel", "last_name": "bareket", "id":  "11120", "existing_magic_skills": {}, "desired_magic_skills": {} }, "debi@buzaglo.fr": {"email": "debi@buzaglo.fr", "password": "buzabuza", "first_name": "debi", "last_name": "buzaglo", "id":  "11121", "existing_magic_skills": {}, "desired_magic_skills": {} }}
+{
+ "noam1563@gmail.com": {
+  "_id": "11112",
+  "_first_name": "Noam",
+  "_last_name": "Siegel",
+  "_email": "noam1563@gmail.com",
+  "_password": "12345678",
+  "_creation_time": "16/07/20",
+  "_last_update_time": "16/07/20 - 17:01:44",
+  "_existing_magic_skills": {
+   "Abra_Kadabra": {
+    "name": "Abra_Kadabra",
+    "level": 5
+   }
+  },
+  "_desired_magic_skills": {
+   "Abra_Kadabra_plus": {
+    "name": "Abra_Kadabra_plus",
+    "level": 1
+   }
+  }
+ },
+ "odelia131@gmail.com": {
+  "_id": "11113",
+  "_first_name": "Odelia",
+  "_last_name": "Siegel-Bareket",
+  "_email": "odelia131@gmail.com",
+  "_password": "12345678",
+  "_creation_time": "16/07/20",
+  "_last_update_time": "16/07/20 - 17:01:44",
+  "_existing_magic_skills": {},
+  "_desired_magic_skills": {}
+ },
+ "tryme@try.me": {
+  "_id": "11114",
+  "_first_name": "try",
+  "_last_name": "me",
+  "_email": "tryme@try.me",
+  "_password": "try123me",
+  "_creation_time": "16/07/20",
+  "_last_update_time": "16/07/20 - 17:01:44",
+  "_existing_magic_skills": {},
+  "_desired_magic_skills": {}
+ },
+ "yitz@itc.tech": {
+  "_id": "11115",
+  "_first_name": "yitz",
+  "_last_name": "shpitz",
+  "_email": "yitz@itc.tech",
+  "_password": "yitz1234",
+  "_creation_time": "16/07/20",
+  "_last_update_time": "16/07/20 - 17:01:44",
+  "_existing_magic_skills": {},
+  "_desired_magic_skills": {}
+ },
+ "naomi@kids.com": {
+  "_id": "11116",
+  "_first_name": "naomi",
+  "_last_name": "siegel bareket",
+  "_email": "naomi@kids.com",
+  "_password": "neyney19",
+  "_creation_time": "16/07/20",
+  "_last_update_time": "16/07/20 - 17:01:44",
+  "_existing_magic_skills": {},
+  "_desired_magic_skills": {}
+ },
+ "nini@kids.com": {
+  "_id": "11117",
+  "_first_name": "nini",
+  "_last_name": "banini",
+  "_email": "nini@kids.com",
+  "_password": "nini2020",
+  "_creation_time": "16/07/20",
+  "_last_update_time": "16/07/20 - 17:01:44",
+  "_existing_magic_skills": {},
+  "_desired_magic_skills": {}
+ },
+ "go@try.me": {
+  "_id": "11118",
+  "_first_name": "go",
+  "_last_name": "try me",
+  "_email": "go@try.me",
+  "_password": "12345678",
+  "_creation_time": "16/07/20",
+  "_last_update_time": "16/07/20 - 17:01:44",
+  "_existing_magic_skills": {},
+  "_desired_magic_skills": {}
+ },
+ "odish@siegel.com": {
+  "_id": "11119",
+  "_first_name": "odish",
+  "_last_name": "siegel",
+  "_email": "odish@siegel.com",
+  "_password": "77777777",
+  "_creation_time": "16/07/20",
+  "_last_update_time": "16/07/20 - 17:01:44",
+  "_existing_magic_skills": {},
+  "_desired_magic_skills": {}
+ },
+ "daniel@bareket.co.il": {
+  "_id": "11120",
+  "_first_name": "daniel",
+  "_last_name": "bareket",
+  "_email": "daniel@bareket.co.il",
+  "_password": "dani1234",
+  "_creation_time": "16/07/20",
+  "_last_update_time": "16/07/20 - 17:01:44",
+  "_existing_magic_skills": {},
+  "_desired_magic_skills": {}
+ },
+ "debi@buzaglo.fr": {
+  "_id": "11121",
+  "_first_name": "debi",
+  "_last_name": "buzaglo",
+  "_email": "debi@buzaglo.fr",
+  "_password": "buzabuza",
+  "_creation_time": "16/07/20",
+  "_last_update_time": "16/07/20 - 17:01:44",
+  "_existing_magic_skills": {},
+  "_desired_magic_skills": {}
+ }
+}

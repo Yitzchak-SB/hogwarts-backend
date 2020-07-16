@@ -2,7 +2,7 @@ from datetime import datetime
 
 
 class Person:
-    def __init__(self, id, first_name, last_name, email, password, creation_time=None):
+    def __init__(self, id, first_name, last_name, email, password, creation_time=[]):
         self._id = id
         self._first_name = first_name
         self._last_name = last_name
@@ -13,7 +13,7 @@ class Person:
 
     @staticmethod
     def add_creation_time(creation_time):
-        if creation_time is None:
+        if not creation_time:
             return datetime.now().strftime("%d/%m/%y")
         return creation_time
 

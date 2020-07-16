@@ -60,7 +60,7 @@ class Validations:
         try:
             datetime.strptime(date, '%d/%m/%y')
         except ValueError:
-            print("Date is not Valid")
+            raise ValueError("Date is not Valid")
         return True
 
     @staticmethod

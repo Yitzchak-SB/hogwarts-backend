@@ -1,7 +1,7 @@
 import json
-
 from classes.Admin import Admin
 from classes.Student import Student
+from data.JsonEnc import JsonEnc
 
 
 class DataLayer:
@@ -11,7 +11,6 @@ class DataLayer:
 
     def get_student_by_email(self, email):
         student = self._students[email]
-        student.edit_update_time()
         return student.__dict__
 
     def create_new_student(self, student_data):
@@ -41,7 +40,7 @@ class DataLayer:
 
     def get_all_students_json(self):
         data = self.get_all_students()
-        result = map(lambda key: json.dumps({key: data[key]}), data)
+        result = map(lambda key: json.dumps({key: data[key]}, cls=JsonEnc, indent=1), data)
         return result
 
     def delete_student(self, student_email):
@@ -49,31 +48,31 @@ class DataLayer:
 
     def persist_all_students(self):
         with open("data/students.json", "w") as write_file:
-            json.dump(self._students, write_file)
+            json.dump(self._students, write_file, cls=JsonEnc, indent=1)
 
     def persist_all_admins(self):
         with open("data/admins.json", "w") as write_file:
-            json.dump(self._admins, write_file)
+            json.dump(self._admins, write_file, cls=JsonEnc, indent=1)
 
     def load_students(self):
         with open("data/students.json", "r") as read_file:
             students_data = json.load(read_file)
             for key in students_data:
-                student = Student(students_data[key]["id"], students_data[key]["first_name"], students_data[key]["last_name"], students_data[key]["email"], students_data[key]["password"], students_data[key]["existing_magic_skills"], students_data[key]["desired_magic_skills"])
-                self._students[students_data[key]["email"]] = student
+                student = Student(students_data[key]["_id"], students_data[key]["_first_name"], students_data[key]["_last_name"], students_data[key]["_email"], students_data[key]["_password"], students_data[key]["_creation_time"], students_data[key]["_existing_magic_skills"], students_data[key]["_desired_magic_skills"])
+                self._students[students_data[key]["_email"]] = student
 
     def load_admins(self):
         with open("data/admins.json", "r") as read_file:
             admins_data = json.load(read_file)
             for key in admins_data:
-                admin = Admin(admins_data[key]["id"], admins_data[key]["first_name"], admins_data[key]["last_name"], admins_data[key]["email"], admins_data[key]["password"])
-                self._admins[admins_data[key]["email"]] = admin
+                admin = Admin(admins_data[key]["_id"], admins_data[key]["_first_name"], admins_data[key]["_last_name"], admins_data[key]["_email"], admins_data[key]["_password"])
+                self._admins[admins_data[key]["_email"]] = admin
 
     def get_count_of_existing_skills(self, skill):
         count = 0
         students_pool = self.get_all_students()
         for key in students_pool:
-            for name in students_pool[key]["existing_magic_skills"]:
+            for name in students_pool[key]["_existing_magic_skills"]:
                 if skill == name:
                     count += 1
         return count
@@ -82,7 +81,7 @@ class DataLayer:
         count = 0
         students_pool = self.get_all_students()
         for key in students_pool:
-            for name in students_pool[key]["desired_magic_skills"]:
+            for name in students_pool[key]["_desired_magic_skills"]:
                 if skill == name:
                     count += 1
         return count

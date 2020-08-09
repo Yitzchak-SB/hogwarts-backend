@@ -1,10 +1,11 @@
 from flask import Flask, request, json
+from flask_cors import CORS
 from data.DataLayer import DataLayer
 from Validations import Validations
 from data.JsonEnc import JsonEnc
 
 app = Flask(__name__)
-
+cors = CORS(app)
 
 @app.before_first_request
 def setup():
@@ -28,6 +29,46 @@ def get_student_by_email(student_email):
     except KeyError:
         return app.response_class(response=json.dumps({"message": "Student not found"}), status=404, mimetype="application/json")
 
+
+@app.route("/admin", methods=["POST"])
+def add_new_admin():
+    try:
+        admin_data = request.json
+        if admin_data is not None:
+            try:
+                Validations.validate_add_new_user(admin_data)
+            except ValueError as e:
+                print(e)
+                return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=400,
+                                          mimetype="application/json")
+            data_layer.create_new_admin(admin_data)
+            data_layer.persist_all_admins()
+            return app.response_class(response=json.dumps({"message": "{} was created".format(admin_data["email"])}), status=200, mimetype="application/json")
+        return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
+                                  mimetype="application/json")
+    except KeyError:
+        return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
+                                  mimetype="application/json")
+
+
+@app.route("/admin/login", methods=["POST"])
+def login_admin():
+    try:
+        admin_data = request.json
+        if admin_data is not None:
+            try:
+                Validations.validate_admin(admin_data, data_layer._admins)
+                admin = data_layer.get_admin_by_email(admin_data["email"])
+            except ValueError as e:
+                print(e)
+                return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=400,
+                                          mimetype="application/json")
+            return app.response_class(response=json.dumps(admin, cls=JsonEnc, indent=1), status=200, mimetype="application/json")
+        return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
+                                  mimetype="application/json")
+    except KeyError:
+        return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
+                                  mimetype="application/json")
 
 @app.route("/student", methods=["DELETE"])
 def delete_student():
@@ -57,12 +98,13 @@ def delete_student():
 @app.route("/student", methods=["POST"])
 def add_new_student():
     try:
-        request_data = request.json
+        
+        request_data = request.json["data"]
         if request_data is not None:
             admin_data = request_data["admin"]
             student_data = request_data["student"]
             try:
-                Validations.validate_admin(admin_data, data_layer)
+                Validations.validate_admin_json(admin_data, data_layer)
                 Validations.validate_add_new_user(student_data)
             except ValueError as e:
                 print(e)
@@ -102,7 +144,7 @@ def login_student():
 def edit_student():
     try:
         student_data = request.json
-        if student_data is not None:
+        if student_data:
             try:
                 Validations.validate_existing(student_data, data_layer._students)
             except ValueError as e:
@@ -110,10 +152,11 @@ def edit_student():
                 return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=400,
                                           mimetype="application/json")
             data_layer.set_student_by_email(student_data)
-            student = data_layer.get_student_by_email(student_data["email"])
+            student = data_layer.get_student_by_email(student_data["initial_email"])
             data_layer.persist_all_students()
+            data_layer.load_students()
             return app.response_class(response=json.dumps(student, cls=JsonEnc, indent=1), status=200, mimetype="application/json")
-        return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
+        return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=403,
                                   mimetype="application/json")
     except KeyError:
         return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,

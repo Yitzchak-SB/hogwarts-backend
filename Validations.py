@@ -13,14 +13,12 @@ class Validations:
 
     @staticmethod
     def validate_add_new_user(data):
-        if not data["id"] or type(data["id"]) != str:
-            raise ValueError("Id is not Valid")
-        elif not data["first_name"] or type(data["first_name"]) != str:
+        if not data["first_name"] or type(data["first_name"]) != str:    
             raise ValueError("First name is not Valid")
         elif not data["last_name"] or type(data["last_name"]) != str:
             raise ValueError("Last name is not Valid")
-        elif not data["email"] or Validations.validate_email_format(data["email"]):
-            raise ValueError("First name is not Valid")
+        elif not data["email"] or not Validations.validate_email_format(data["email"]):
+            raise ValueError("Email is not Valid")
         elif not data["password"] or type(data["password"]) != str:
             raise ValueError("Password is not Valid")
         return True
@@ -31,7 +29,7 @@ class Validations:
             raise ValueError("Id is not Valid")
         elif not data["password"] or type(data["password"]) != str:
             raise ValueError("Password is not Valid")
-        elif data["email"] not in users_pool:
+        elif data["initial_email"] not in users_pool:
             raise ValueError("User does not exist")
         return True
 
@@ -69,12 +67,26 @@ class Validations:
 
     @staticmethod
     def validate_admin(data, data_layer):
-        Validations.validate_existing(data, data_layer._admins)
+        print(data)
         try:
-            admin = data_layer._admins[data["email"]]
-            if data["id"] != admin._id or data["password"] != admin._password:
+            email = data["email"]
+            admin = data_layer[email]
+            password = admin.get_password()
+            if data["password"] != password:
                 raise ValueError("Admin not valid")
         except ValueError:
             print("Admin not valid")
+        return True
 
+    @staticmethod
+    def validate_admin_json(data, data_layer):
+        try:
+            email = data["_email"]
+            admin = data_layer.get_admin_by_email(email)
+            if data["_password"] != admin["_password"]:
+                raise ValueError("Admin not valid")
+            print("2")
+        except ValueError:
+            print("Admin not valid")
+        return True
 

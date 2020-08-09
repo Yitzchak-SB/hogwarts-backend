@@ -4,8 +4,8 @@ from classes.Skill import Skill
 
 
 class Student(Person):
-    def __init__(self, id, first_name, last_name, email, password, creation_time, existing_magic_skills={}, desired_magic_skills={}):
-        Person.__init__(self, id, first_name, last_name, email, password, creation_time)
+    def __init__(self, first_name, last_name, email, password, creation_time=[], existing_magic_skills={}, desired_magic_skills={}):
+        Person.__init__(self, first_name, last_name, email, password, creation_time=[])
         self._existing_magic_skills = existing_magic_skills
         self._desired_magic_skills = desired_magic_skills
 

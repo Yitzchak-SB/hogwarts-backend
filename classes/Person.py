@@ -1,9 +1,10 @@
 from datetime import datetime
+import uuid
 
 
 class Person:
-    def __init__(self, id, first_name, last_name, email, password, creation_time=[]):
-        self._id = id
+    def __init__(self, first_name, last_name, email, password, creation_time=[]):
+        self._id = str(uuid.uuid1())
         self._first_name = first_name
         self._last_name = last_name
         self._email = email

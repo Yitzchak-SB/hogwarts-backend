@@ -48,6 +48,11 @@ class DataLayer:
                 student.set_last_name(new_student_data[key])
             elif key == "email":
                 student.set_email(new_student_data[key])
+            elif key == "desired_magic_skills":
+                student.update_existing_skills(new_student_data[key])
+            elif key == "existing_magic_skills":
+                student.update_desired_skills(new_student_data[key])
+        print("done updating")
         new_student = self._mongo.edit_student_by_email(
             email, student.get_student_data())
         return new_student
@@ -94,22 +99,12 @@ class DataLayer:
                 self._admins[admins_data[key]["_email"]] = admin
 
     def get_count_of_existing_skills(self, skill):
-        count = 0
-        students_pool = self.get_all_students()
-        for key in students_pool:
-            for name in key["_existing_magic_skills"]:
-                if skill == name:
-                    count += 1
-        return count
+        result = self._mongo.get_count_of_existing_skill(skill)
+        return result
 
     def get_count_of_desired_skills(self, skill):
-        count = 0
-        students_pool = self.get_all_students()
-        for key in students_pool:
-            for name in key["_desired_magic_skills"]:
-                if skill == name:
-                    count += 1
-        return count
+        result = self._mongo.get_count_of_desired_skill(skill)
+        return result
 
     def add_existing_skill_by_email(self, data):
         student = self._students[data["email"]]
@@ -122,3 +117,10 @@ class DataLayer:
         student.add_desired_skills(
             data["skill"]["name"], data["skill"]["level"])
         student.edit_update_time()
+
+    def get_count_of_students_added_at_date(self, date):
+        result = self._mongo.get_count_of_students_added_at_date(date)
+        return result
+
+    def shutdown(self):
+        self._mongo.shutdown()

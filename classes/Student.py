@@ -10,6 +10,18 @@ class Student(Person):
         self._existing_magic_skills = existing_magic_skills
         self._desired_magic_skills = desired_magic_skills
 
+    def update_existing_skills(self, skills_array):
+        for skill in skills_array:
+            if type(skill) is dict:
+                print(skill)
+                self.add_existing_skills(skill["name"], skill["level"])
+
+    def update_desired_skills(self, skills_array):
+        for skill in skills_array:
+            if type(skill) is dict:
+                print(skill)
+                self.add_desired_skills(skill["name"], skill["level"])
+
     def get_student_data(self):
         data = {"_first_name": self._first_name, "_last_name": self._last_name, "_email": self._email,
                 "_password": self._password, "_creation_time": self._creation_time, "_last_update_time": self._last_update_time, "_desired_magic_skills": self._desired_magic_skills, "_existing_magic_skills": self._existing_magic_skills}
@@ -17,21 +29,26 @@ class Student(Person):
 
     def get_student_secure_data(self):
         data = {"_first_name": self._first_name, "_last_name": self._last_name, "_email": self._email,
-                "_creation_time": self._creation_time, "_last_update_time": self._last_update_time, "_desired_magic_skills": self._desired_magic_skills, "_existing_magic_skills": self._existing_magic_skills}
+                "_id": self._id, "_creation_time": self._creation_time, "_last_update_time": self._last_update_time, "_desired_magic_skills": self._desired_magic_skills, "_existing_magic_skills": self._existing_magic_skills}
         return data
 
     def add_existing_skills(self, name, level):
         skill = Skill(name, level)
-        self._existing_magic_skills[name] = skill
-        if name in self._desired_magic_skills and self._desired_magic_skills[name]["level"]:
-            if self._existing_magic_skills[name]["level"] >= 5:
-                del self._desired_magic_skills[name]
-                return
-            self._desired_magic_skills[name]["level"] += 1
+        if skill in self._existing_magic_skills:
+            return
+        else:
+            print(["adding", skill])
+            self._existing_magic_skills.append(skill.__dict__)
+            return skill
 
     def add_desired_skills(self, name, level):
         skill = Skill(name, level)
-        self._desired_magic_skills[name] = skill
+        if skill in self._desired_magic_skills:
+            return
+        else:
+            print(["adding", skill])
+            self._desired_magic_skills.append(skill.__dict__)
+            return skill
 
     def __str__(self):
         return json.dumps(self.__dict__)

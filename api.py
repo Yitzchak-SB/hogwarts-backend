@@ -3,17 +3,11 @@ from flask_cors import CORS
 from data.DataLayer import DataLayer
 from Validations import Validations
 from data.JsonEnc import JsonEnc
+import atexit
 
 app = Flask(__name__)
 cors = CORS(app)
-
-
-@app.before_first_request
-def setup():
-    global data_layer
-    data_layer = DataLayer()
-    # data_layer.load_students()
-    # data_layer.load_admins()
+data_layer = DataLayer()
 
 
 @app.route("/student/<student_email>")
@@ -196,19 +190,25 @@ def get_students_by_added_date():
                                   mimetype="application/json")
 
 
+@app.route("/student")
+def get_count_of_students_added_at_date():
+    date = request.args.get("date")
+    date = date.replace("/", "_")
+    result = data_layer.get_count_of_students_added_at_date(date)
+    return app.response_class(response=json.dumps({"result": result}, indent=1), status=200, mimetype="application/json")
+
+
 @app.route("/desire")
 def get_count_of_desired_skill():
     skill = request.args.get("skill")
     count = data_layer.get_count_of_desired_skills(skill)
-    data_layer.persist_all_students()
     return app.response_class(response=json.dumps({skill: count}), status=200, mimetype="application/json")
 
 
-@app.route("/have")
+@app.route("/exist")
 def get_count_of_existing_skill():
     skill = request.args.get("skill")
     count = data_layer.get_count_of_existing_skills(skill)
-    data_layer.persist_all_students()
     return app.response_class(response=json.dumps({skill: count}), status=200, mimetype="application/json")
 
 
@@ -259,30 +259,9 @@ def add_existing_skill():
                                   mimetype="application/json")
 
 
-@app.route("/skills")
-def get_count_of_skills():
-    try:
-        desired_skills = {}
-        existing_skills = {}
-        skills_names = [
-            "Potion making",
-            "Spells",
-            "Quidditch",
-            "Animagus",
-            "Apparate",
-            "Metamorphmagi",
-            "Parseltongue",
-        ]
-        for name in skills_names:
-            desired_skill = data_layer.get_count_of_desired_skills(name)
-            existing_skill = data_layer.get_count_of_existing_skills(name)
-            desired_skills[name] = {"name": name, "count": desired_skill}
-            existing_skills[name] = {"name": name, "count": existing_skill}
-        return app.response_class(response=json.dumps({"skills": {"desired_skills": desired_skills, "existing_skills": existing_skills}}), status=200,
-                                  mimetype="application/json")
-    except KeyError:
-        return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
-                                  mimetype="application/json")
+@atexit.register
+def shutdown():
+    data_layer.shutdown()
 
 
 if __name__ == "__main__":

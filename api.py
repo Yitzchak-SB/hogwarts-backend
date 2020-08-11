@@ -7,12 +7,13 @@ from data.JsonEnc import JsonEnc
 app = Flask(__name__)
 cors = CORS(app)
 
+
 @app.before_first_request
 def setup():
     global data_layer
     data_layer = DataLayer()
-    data_layer.load_students()
-    data_layer.load_admins()
+    # data_layer.load_students()
+    # data_layer.load_admins()
 
 
 @app.route("/student/<student_email>")
@@ -57,7 +58,8 @@ def login_admin():
         admin_data = request.json
         if admin_data is not None:
             try:
-                Validations.validate_admin(admin_data, data_layer._admins)
+                Validations.validate_admin_login(
+                    admin_data, data_layer)
                 admin = data_layer.get_admin_by_email(admin_data["email"])
             except ValueError as e:
                 print(e)
@@ -70,23 +72,25 @@ def login_admin():
         return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
                                   mimetype="application/json")
 
-@app.route("/student", methods=["DELETE"])
+
+@app.route("/student-del", methods=["POST"])
 def delete_student():
     try:
         request_data = request.json
         if request_data is not None:
             admin_data = request_data["admin"]
             student_data = request_data["student"]
+            student_db = data_layer._mongo.get_student_by_email(
+                student_data["email"])
             try:
                 Validations.validate_admin(admin_data, data_layer)
-                Validations.validate_existing(student_data, data_layer._students)
+                Validations.validate_existing(
+                    student_data, data_layer._students)
             except ValueError as e:
                 print(e)
                 return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=400,
                                           mimetype="application/json")
-            student = data_layer.get_student_by_email(student_data["email"])
-            data_layer.delete_student(student_data["email"])
-            data_layer.persist_all_students()
+            student = data_layer.delete_student(student_db["_id"])
             return app.response_class(response=json.dumps({"message": "{} was deleted".format(student_data["email"]), "deleted": student}), status=200, mimetype="application/json")
         return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
                                   mimetype="application/json")
@@ -98,13 +102,13 @@ def delete_student():
 @app.route("/student", methods=["POST"])
 def add_new_student():
     try:
-        
+
         request_data = request.json["data"]
         if request_data is not None:
             admin_data = request_data["admin"]
             student_data = request_data["student"]
             try:
-                Validations.validate_admin_json(admin_data, data_layer)
+                Validations.validate_admin(admin_data, data_layer)
                 Validations.validate_add_new_user(student_data)
             except ValueError as e:
                 print(e)
@@ -126,7 +130,8 @@ def login_student():
         student_data = request.json
         if student_data is not None:
             try:
-                Validations.validate_existing(student_data, data_layer._students)
+                Validations.validate_existing(
+                    student_data, data_layer._students)
             except ValueError as e:
                 print(e)
                 return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=400,
@@ -146,15 +151,14 @@ def edit_student():
         student_data = request.json
         if student_data:
             try:
-                Validations.validate_existing(student_data, data_layer._students)
+                Validations.validate_existing(
+                    student_data, data_layer._students)
             except ValueError as e:
                 print(e)
                 return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=400,
                                           mimetype="application/json")
-            data_layer.set_student_by_email(student_data)
-            student = data_layer.get_student_by_email(student_data["initial_email"])
-            data_layer.persist_all_students()
-            data_layer.load_students()
+
+            student = data_layer.set_student_by_email(student_data)
             return app.response_class(response=json.dumps(student, cls=JsonEnc, indent=1), status=200, mimetype="application/json")
         return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=403,
                                   mimetype="application/json")
@@ -165,8 +169,8 @@ def edit_student():
 
 @app.route("/students")
 def get_all_students():
-    students = data_layer.get_all_students_json()
-    return app.response_class(response=students, status=200, mimetype="application/json")
+    students = data_layer.get_all_students()
+    return app.response_class(response=json.dumps({"students": students}), status=200, mimetype="application/json")
 
 
 @app.route("/students/")
@@ -214,7 +218,8 @@ def add_desired_skill():
         data = request.json
         if data is not None:
             try:
-                Validations.validate_email_existing(data["email"], data_layer._students)
+                Validations.validate_email_existing(
+                    data["email"], data_layer._students)
                 Validations.validate_email_format(data["email"])
             except ValueError as e:
                 print(e)
@@ -229,13 +234,15 @@ def add_desired_skill():
         return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
                                   mimetype="application/json")
 
+
 @app.route("/have", methods=["POST"])
 def add_existing_skill():
     try:
         data = request.json
         if data is not None:
             try:
-                Validations.validate_email_existing(data["email"], data_layer._students)
+                Validations.validate_email_existing(
+                    data["email"], data_layer._students)
                 Validations.validate_email_format(data["email"])
             except ValueError as e:
                 print(e)
@@ -246,6 +253,32 @@ def add_existing_skill():
             return app.response_class(response=json.dumps({"message": "{} level {} was added to {}".format(
                 data["skill"]["name"], data["skill"]["level"], data["email"])}), status=200, mimetype="application/json")
         return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
+                                  mimetype="application/json")
+    except KeyError:
+        return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
+                                  mimetype="application/json")
+
+
+@app.route("/skills")
+def get_count_of_skills():
+    try:
+        desired_skills = {}
+        existing_skills = {}
+        skills_names = [
+            "Potion making",
+            "Spells",
+            "Quidditch",
+            "Animagus",
+            "Apparate",
+            "Metamorphmagi",
+            "Parseltongue",
+        ]
+        for name in skills_names:
+            desired_skill = data_layer.get_count_of_desired_skills(name)
+            existing_skill = data_layer.get_count_of_existing_skills(name)
+            desired_skills[name] = {"name": name, "count": desired_skill}
+            existing_skills[name] = {"name": name, "count": existing_skill}
+        return app.response_class(response=json.dumps({"skills": {"desired_skills": desired_skills, "existing_skills": existing_skills}}), status=200,
                                   mimetype="application/json")
     except KeyError:
         return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,

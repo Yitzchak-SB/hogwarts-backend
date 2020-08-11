@@ -4,10 +4,21 @@ from classes.Skill import Skill
 
 
 class Student(Person):
-    def __init__(self, first_name, last_name, email, password, creation_time=[], existing_magic_skills={}, desired_magic_skills={}):
-        Person.__init__(self, first_name, last_name, email, password, creation_time=[])
+    def __init__(self, first_name, last_name, email, password, id=[], creation_time=[], existing_magic_skills={}, desired_magic_skills={}):
+        Person.__init__(self, first_name, last_name, email,
+                        password, id=[], creation_time=[])
         self._existing_magic_skills = existing_magic_skills
         self._desired_magic_skills = desired_magic_skills
+
+    def get_student_data(self):
+        data = {"_first_name": self._first_name, "_last_name": self._last_name, "_email": self._email,
+                "_password": self._password, "_creation_time": self._creation_time, "_last_update_time": self._last_update_time, "_desired_magic_skills": self._desired_magic_skills, "_existing_magic_skills": self._existing_magic_skills}
+        return data
+
+    def get_student_secure_data(self):
+        data = {"_first_name": self._first_name, "_last_name": self._last_name, "_email": self._email,
+                "_creation_time": self._creation_time, "_last_update_time": self._last_update_time, "_desired_magic_skills": self._desired_magic_skills, "_existing_magic_skills": self._existing_magic_skills}
+        return data
 
     def add_existing_skills(self, name, level):
         skill = Skill(name, level)
@@ -44,5 +55,3 @@ class Student(Person):
     def from_json(cls, json_string):
         data = json.loads(json_string)
         return cls(data["id"], data["first_name"], data["last_name"], data["email"], data["password"])
-
-

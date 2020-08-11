@@ -13,7 +13,7 @@ class Validations:
 
     @staticmethod
     def validate_add_new_user(data):
-        if not data["first_name"] or type(data["first_name"]) != str:    
+        if not data["first_name"] or type(data["first_name"]) != str:
             raise ValueError("First name is not Valid")
         elif not data["last_name"] or type(data["last_name"]) != str:
             raise ValueError("Last name is not Valid")
@@ -25,12 +25,14 @@ class Validations:
 
     @staticmethod
     def validate_existing(data, users_pool):
-        if not data["id"] or type(data["id"]) != str:
+        """
+        if not data["data"]["id"] or type(data["id"]) != str:
             raise ValueError("Id is not Valid")
-        elif not data["password"] or type(data["password"]) != str:
+        elif not data["data"]["password"] or type(data["password"]) != str:
             raise ValueError("Password is not Valid")
         elif data["initial_email"] not in users_pool:
-            raise ValueError("User does not exist")
+            raise ValueError("User does not exist")"""
+
         return True
 
     @staticmethod
@@ -67,26 +69,22 @@ class Validations:
 
     @staticmethod
     def validate_admin(data, data_layer):
-        print(data)
         try:
-            email = data["email"]
-            admin = data_layer[email]
-            password = admin.get_password()
-            if data["password"] != password:
+            email = data["_email"]
+            admin = data_layer._mongo.get_admin_by_email(email)
+            if data["_password"] != admin["_password"]:
                 raise ValueError("Admin not valid")
         except ValueError:
             print("Admin not valid")
         return True
 
     @staticmethod
-    def validate_admin_json(data, data_layer):
+    def validate_admin_login(data, data_layer):
         try:
-            email = data["_email"]
-            admin = data_layer.get_admin_by_email(email)
-            if data["_password"] != admin["_password"]:
+            email = data["email"]
+            admin = data_layer._mongo.get_admin_by_email(email)
+            if data["password"] != admin["_password"]:
                 raise ValueError("Admin not valid")
-            print("2")
         except ValueError:
             print("Admin not valid")
         return True
-

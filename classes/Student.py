@@ -4,22 +4,20 @@ from classes.Skill import Skill
 
 
 class Student(Person):
-    def __init__(self, first_name, last_name, email, password, id=[], creation_time=[], existing_magic_skills={}, desired_magic_skills={}):
+    def __init__(self, first_name, last_name, email, password, id=[], creation_time=[], ):
         Person.__init__(self, first_name, last_name, email,
-                        password, id=[], creation_time=[])
-        self._existing_magic_skills = existing_magic_skills
-        self._desired_magic_skills = desired_magic_skills
+                        password, creation_time=[], id=[])
+        self._existing_magic_skills = []
+        self._desired_magic_skills = []
 
     def update_existing_skills(self, skills_array):
         for skill in skills_array:
             if type(skill) is dict:
-                print(skill)
                 self.add_existing_skills(skill["name"], skill["level"])
 
     def update_desired_skills(self, skills_array):
         for skill in skills_array:
             if type(skill) is dict:
-                print(skill)
                 self.add_desired_skills(skill["name"], skill["level"])
 
     def get_student_data(self):
@@ -37,7 +35,6 @@ class Student(Person):
         if skill in self._existing_magic_skills:
             return
         else:
-            print(["adding", skill])
             self._existing_magic_skills.append(skill.__dict__)
             return skill
 
@@ -46,7 +43,6 @@ class Student(Person):
         if skill in self._desired_magic_skills:
             return
         else:
-            print(["adding", skill])
             self._desired_magic_skills.append(skill.__dict__)
             return skill
 

@@ -30,17 +30,25 @@ class DataLayer:
         return admin
 
     def create_new_student(self, student_data):
-        student_ins = Student(student_data["first_name"], student_data["last_name"],
-                              student_data["email"], student_data["password"])
+        student_ins = Student(first_name=student_data["first_name"], last_name=student_data["last_name"],
+                              email=student_data["email"], password=student_data["password"])
+        student_ins.update_desired_skills(student_data["desired_magic_skills"])
+        student_ins.update_existing_skills(
+            student_data["existing_magic_skills"])
+        print(student_ins.get_student_data())
         student = self._mongo.set_new_student(student_ins.get_student_data())
         return student
 
     def set_student_by_email(self, student_data):
         email = student_data["initial_email"]
-        new_student_data = student_data["data"]
+        new_student_data = student_data["student"]
         old_student_data = self._mongo.get_student_by_email(email)
-        student = Student(old_student_data["_first_name"], old_student_data["_last_name"], old_student_data["_email"], old_student_data["_password"],
-                          old_student_data["_id"], old_student_data["_creation_time"], old_student_data["_existing_magic_skills"], old_student_data["_desired_magic_skills"])
+        student = Student(first_name=old_student_data["_first_name"], last_name=old_student_data["_last_name"], email=old_student_data["_email"], password=old_student_data["_password"],
+                          id=old_student_data["_id"], creation_time=old_student_data["_creation_time"], )
+        student.update_existing_skills(
+            old_student_data["_existing_magic_skills"])
+        student.update_desired_skills(
+            old_student_data["_desired_magic_skills"])
         for key in new_student_data:
             if key == "first_name":
                 student.set_first_name(new_student_data[key])
@@ -52,7 +60,6 @@ class DataLayer:
                 student.update_existing_skills(new_student_data[key])
             elif key == "existing_magic_skills":
                 student.update_desired_skills(new_student_data[key])
-        print("done updating")
         new_student = self._mongo.edit_student_by_email(
             email, student.get_student_data())
         return new_student
@@ -61,8 +68,14 @@ class DataLayer:
         students_data = self._mongo.get_all_students()
         students = []
         for student in students_data:
-            student_ins = Student(student["_first_name"], student["_last_name"], student["_email"], student["_password"],
-                                  student["_id"], student["_creation_time"], student["_existing_magic_skills"], student["_desired_magic_skills"])
+            student_ins = Student(first_name=student["_first_name"], last_name=student["_last_name"], email=student["_email"], password=student["_password"],
+                                  id=student["_id"], creation_time=student["_creation_time"])
+            if len(student["_existing_magic_skills"]) > 0:
+                student_ins.update_existing_skills(
+                    student["_existing_magic_skills"])
+            if len(student["_desired_magic_skills"]) > 0:
+                student_ins.update_desired_skills(
+                    student["_desired_magic_skills"])
             students.append(student_ins.get_student_secure_data())
         return students
 

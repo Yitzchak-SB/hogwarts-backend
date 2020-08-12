@@ -96,7 +96,6 @@ def delete_student():
 @app.route("/student", methods=["POST"])
 def add_new_student():
     try:
-
         request_data = request.json["data"]
         if request_data is not None:
             admin_data = request_data["admin"]
@@ -109,7 +108,6 @@ def add_new_student():
                 return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=400,
                                           mimetype="application/json")
             data_layer.create_new_student(student_data)
-            data_layer.persist_all_students()
             return app.response_class(response=json.dumps({"message": "{} was created".format(student_data["email"])}), status=200, mimetype="application/json")
         return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
                                   mimetype="application/json")
@@ -142,7 +140,8 @@ def login_student():
 @app.route("/student/edit", methods=["POST"])
 def edit_student():
     try:
-        student_data = request.json
+        raw_data = request.json
+        student_data = raw_data["data"]["student"]
         if student_data:
             try:
                 Validations.validate_existing(
@@ -152,9 +151,9 @@ def edit_student():
                 return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=400,
                                           mimetype="application/json")
 
-            student = data_layer.set_student_by_email(student_data)
+            student = data_layer.set_student_by_email(raw_data["data"])
             return app.response_class(response=json.dumps(student, cls=JsonEnc, indent=1), status=200, mimetype="application/json")
-        return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=403,
+        return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
                                   mimetype="application/json")
     except KeyError:
         return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,

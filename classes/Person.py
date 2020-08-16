@@ -3,7 +3,7 @@ import uuid
 
 
 class Person:
-    def __init__(self, first_name, last_name, email, password, id=[], creation_time=[]):
+    def __init__(self, first_name, last_name, email, password, id=[], creation_time=False):
         self._id = id
         self._first_name = first_name
         self._last_name = last_name
@@ -11,6 +11,7 @@ class Person:
         self._password = password
         self._creation_time = self.add_creation_time(creation_time)
         self._last_update_time = datetime.now().strftime("%y/%m/%d - %H:%M:%S")
+        self.edit_update_time()
 
     @staticmethod
     def add_creation_time(creation_time):

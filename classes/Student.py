@@ -67,8 +67,3 @@ class Student(Person):
 
     def set_email(self, email):
         self._email = email
-
-    @classmethod
-    def from_json(cls, json_string):
-        data = json.loads(json_string)
-        return cls(data["id"], data["first_name"], data["last_name"], data["email"], data["password"])

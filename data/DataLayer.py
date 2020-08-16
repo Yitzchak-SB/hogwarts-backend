@@ -1,9 +1,8 @@
 import json
 from classes.Admin import Admin
 from classes.Student import Student
-from data.JsonEnc import JsonEnc
 from data.MongoDataLayer import MongoDataLayer
-from data.SqlDataLayer import SqlDataLayer
+from data.mySql.SqlDataLayer import SqlDataLayer
 
 
 class DataLayer:
@@ -14,9 +13,9 @@ class DataLayer:
         self._mySql = SqlDataLayer()
 
     def get_student_by_email(self, email):
-        student_data = self._mongo.get_student_by_email(email)
-        student = Student(student_data["first_name"], student_data["last_name"], student_data["email"], student_data["password"],
-                          student_data["_id"], student_data["creation_time"], student_data["existing_magic_skills"], student_data["desired_magic_skills"])
+        student_data = self._mySql.get_student_by_email(email)
+        student = Student(first_name=student_data["first_name"], last_name=student_data["last_name"], email=student_data["email"], password=student_data["password"],
+                          id=student_data["id"], creation_time=student_data["creation_time"], image_url=student_data["image_url"], existing_magic_skills=student_data["existing_magic_skills"], desired_magic_skills=student_data["desired_magic_skills"])
         return student
 
     def get_admin_by_email(self, email):

@@ -20,7 +20,7 @@ def get_student_by_email(student_email):
                                   mimetype="application/json")
     try:
         student = data_layer.get_student_by_email(student_email)
-        return app.response_class(response=json.dumps(student), status=200, mimetype="application/json")
+        return app.response_class(response=json.dumps(student.get_student_secure_data()), status=200, mimetype="application/json")
     except KeyError:
         return app.response_class(response=json.dumps({"message": "Student not found"}), status=404, mimetype="application/json")
 

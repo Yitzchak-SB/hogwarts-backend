@@ -1,8 +1,10 @@
 import pymongo
+from data.BaseDBLayer import BaseDBLayer
 
 
-class MongoDataLayer:
+class MongoDataLayer(BaseDBLayer):
     def __init__(self):
+        super().__init__()
         self.__create()
 
     def __create(self):

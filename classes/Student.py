@@ -4,11 +4,15 @@ from classes.Skill import Skill
 
 
 class Student(Person):
-    def __init__(self, first_name, last_name, email, password, id=[], creation_time=[], ):
+    def __init__(self, first_name, last_name, email, password, image_url, id=[], creation_time=[], existing_magic_skills=[], desired_magic_skills=[]):
         Person.__init__(self, first_name, last_name, email,
                         password, creation_time=[], id=[])
-        self._existing_magic_skills = []
-        self._desired_magic_skills = []
+        self._image_url = image_url
+        self._existing_magic_skills = existing_magic_skills
+        self._desired_magic_skills = desired_magic_skills
+
+    def set_image_url(self, image_url):
+        self._image_url = image_url
 
     def update_existing_skills(self, skills_array):
         for skill in skills_array:
@@ -22,12 +26,12 @@ class Student(Person):
 
     def get_student_data(self):
         data = {"_first_name": self._first_name, "_last_name": self._last_name, "_email": self._email,
-                "_password": self._password, "_creation_time": self._creation_time, "_last_update_time": self._last_update_time, "_desired_magic_skills": self._desired_magic_skills, "_existing_magic_skills": self._existing_magic_skills}
+                "_password": self._password, "_image_url": self._image_url, "_creation_time": self._creation_time, "_last_update_time": self._last_update_time, "_desired_magic_skills": self._desired_magic_skills, "_existing_magic_skills": self._existing_magic_skills, "_id": self._id}
         return data
 
     def get_student_secure_data(self):
         data = {"_first_name": self._first_name, "_last_name": self._last_name, "_email": self._email,
-                "_id": self._id, "_creation_time": self._creation_time, "_last_update_time": self._last_update_time, "_desired_magic_skills": self._desired_magic_skills, "_existing_magic_skills": self._existing_magic_skills}
+                "_id": self._id, "_image_url": self._image_url, "_creation_time": self._creation_time, "_last_update_time": self._last_update_time, "_desired_magic_skills": self._desired_magic_skills, "_existing_magic_skills": self._existing_magic_skills}
         return data
 
     def add_existing_skills(self, name, level):

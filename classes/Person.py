@@ -10,13 +10,13 @@ class Person:
         self._email = email
         self._password = password
         self._creation_time = self.add_creation_time(creation_time)
-        self._last_update_time = datetime.now().strftime("%d/%m/%y - %H:%M:%S")
+        self._last_update_time = datetime.now().strftime("%y/%m/%d - %H:%M:%S")
 
     @staticmethod
     def add_creation_time(creation_time):
         if not creation_time:
-            return datetime.now().strftime("%d/%m/%y")
+            return datetime.now().strftime("%y/%m/%d")
         return creation_time
 
     def edit_update_time(self):
-        self._last_update_time = datetime.now().strftime("%d/%m/%y - %H:%M:%S")
+        self._last_update_time = datetime.now().strftime("%y/%m/%d - %H:%M:%S")

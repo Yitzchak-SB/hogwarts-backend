@@ -19,7 +19,6 @@ class MongoDataLayer:
         return student
 
     def edit_student_by_email(self, email, new_student_data):
-        print(new_student_data)
         self.__db.students.update({"_email": email}, new_student_data)
 
     def get_admin_by_email(self, email):

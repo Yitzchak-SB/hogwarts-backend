@@ -37,7 +37,6 @@ def add_new_admin():
                 return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=400,
                                           mimetype="application/json")
             data_layer.create_new_admin(admin_data)
-            data_layer.persist_all_admins()
             return app.response_class(response=json.dumps({"message": "{} was created".format(admin_data["email"])}), status=200, mimetype="application/json")
         return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
                                   mimetype="application/json")
@@ -74,7 +73,7 @@ def delete_student():
         if request_data is not None:
             admin_data = request_data["admin"]
             student_data = request_data["student"]
-            student_db = data_layer._mongo.get_student_by_email(
+            student_id = data_layer._mySql.get_students_id_by_email(
                 student_data["email"])
             try:
                 Validations.validate_admin(admin_data, data_layer)
@@ -84,7 +83,7 @@ def delete_student():
                 print(e)
                 return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=400,
                                           mimetype="application/json")
-            student = data_layer.delete_student(student_db["_id"])
+            student = data_layer.delete_student(student_id[0])
             return app.response_class(response=json.dumps({"message": "{} was deleted".format(student_data["email"]), "deleted": student}), status=200, mimetype="application/json")
         return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
                                   mimetype="application/json")
@@ -182,7 +181,6 @@ def get_students_by_added_date():
         for key in students_pool:
             if students_pool[key]["_creation_time"] == date_str:
                 students[students_pool[key]["_email"]] = students_pool[key]
-        data_layer.persist_all_students()
         return app.response_class(response=json.dumps(students, cls=JsonEnc, indent=1), status=200, mimetype="application/json")
     except KeyError:
         return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
@@ -225,7 +223,6 @@ def add_desired_skill():
                 return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=400,
                                           mimetype="application/json")
             data_layer.add_desired_skill_by_email(data)
-            data_layer.persist_all_students()
             return app.response_class(response=json.dumps({"message": "{} level {} was added to {}".format(data["skill"]["name"], data["skill"]["level"], data["email"])}), status=200, mimetype="application/json")
         return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
                                   mimetype="application/json")
@@ -248,11 +245,31 @@ def add_existing_skill():
                 return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=400,
                                           mimetype="application/json")
             data_layer.add_existing_skill_by_email(data)
-            data_layer.persist_all_students()
             return app.response_class(response=json.dumps({"message": "{} level {} was added to {}".format(
                 data["skill"]["name"], data["skill"]["level"], data["email"])}), status=200, mimetype="application/json")
         return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
                                   mimetype="application/json")
+    except KeyError:
+        return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
+                                  mimetype="application/json")
+
+
+@app.route("/updated")
+def get_most_recent_updated_students():
+    try:
+        results = data_layer.get_most_recent_updated_students()
+        return app.response_class(response=json.dumps(results), status=200, mimetype="application/json")
+
+    except KeyError:
+        return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
+                                  mimetype="application/json")
+
+
+@app.route("/created")
+def get_most_recent_created_students():
+    try:
+        results = data_layer.get_most_recent_created_students()
+        return app.response_class(response=json.dumps(results), status=200, mimetype="application/json")
     except KeyError:
         return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
                                   mimetype="application/json")

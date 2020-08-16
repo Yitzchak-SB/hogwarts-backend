@@ -3,6 +3,7 @@ from classes.Admin import Admin
 from classes.Student import Student
 from data.JsonEnc import JsonEnc
 from data.MongoDataLayer import MongoDataLayer
+from data.SqlDataLayer import SqlDataLayer
 
 
 class DataLayer:
@@ -10,6 +11,7 @@ class DataLayer:
         self._students = students
         self._admins = admins
         self._mongo = MongoDataLayer()
+        self._mySql = SqlDataLayer()
 
     def get_student_by_email(self, email):
         student_data = self._mongo.get_student_by_email(email)
@@ -26,29 +28,28 @@ class DataLayer:
     def create_new_admin(self, admin_data):
         admin_ins = Admin(admin_data["first_name"], admin_data["last_name"],
                           admin_data["email"], admin_data["password"])
-        admin = self._mongo.set_new_admin(admin_ins.get_new_admin())
+        admin = self._mySql.set_new_admin(admin_ins.get_new_admin())
         return admin
 
     def create_new_student(self, student_data):
         student_ins = Student(first_name=student_data["first_name"], last_name=student_data["last_name"],
-                              email=student_data["email"], password=student_data["password"])
-        student_ins.update_desired_skills(student_data["desired_magic_skills"])
-        student_ins.update_existing_skills(
-            student_data["existing_magic_skills"])
-        print(student_ins.get_student_data())
-        student = self._mongo.set_new_student(student_ins.get_student_data())
+                              email=student_data["email"], password=student_data["password"], image_url=student_data["image_url"], existing_magic_skills=student_data["existing_magic_skills"], desired_magic_skills=student_data["desired_magic_skills"])
+        student_ins.get_student_data()
+        student = self._mySql.set_new_student(student_ins.get_student_data())
         return student
 
     def set_student_by_email(self, student_data):
         email = student_data["initial_email"]
         new_student_data = student_data["student"]
-        old_student_data = self._mongo.get_student_by_email(email)
-        student = Student(first_name=old_student_data["_first_name"], last_name=old_student_data["_last_name"], email=old_student_data["_email"], password=old_student_data["_password"],
-                          id=old_student_data["_id"], creation_time=old_student_data["_creation_time"], )
-        student.update_existing_skills(
-            old_student_data["_existing_magic_skills"])
-        student.update_desired_skills(
-            old_student_data["_desired_magic_skills"])
+        old_student_data = self._mySql.get_student_by_email(email)
+        existing_magic_skills = self._mySql.get_desired_skills_by_id(
+            old_student_data[6])
+        desired_magic_skills = self._mySql.get_existing_skills_by_id(
+            old_student_data[6])
+        student = Student(first_name=old_student_data[0], last_name=old_student_data[1], email=old_student_data[2],
+                          password=old_student_data[3], image_url=old_student_data[4], creation_time=old_student_data[5], id=student_data[6])
+        student.update_existing_skills(existing_magic_skills)
+        student.update_desired_skills(desired_magic_skills)
         for key in new_student_data:
             if key == "first_name":
                 student.set_first_name(new_student_data[key])
@@ -56,67 +57,35 @@ class DataLayer:
                 student.set_last_name(new_student_data[key])
             elif key == "email":
                 student.set_email(new_student_data[key])
+            elif key == "image_url":
+                student.set_image_url(new_student_data[key])
             elif key == "desired_magic_skills":
                 student.update_existing_skills(new_student_data[key])
             elif key == "existing_magic_skills":
                 student.update_desired_skills(new_student_data[key])
-        new_student = self._mongo.edit_student_by_email(
+        new_student = self._mySql.edit_student_by_email(
             email, student.get_student_data())
         return new_student
 
     def get_all_students(self):
-        students_data = self._mongo.get_all_students()
+        students_data = self._mySql.get_all_students()
         students = []
         for student in students_data:
             student_ins = Student(first_name=student["_first_name"], last_name=student["_last_name"], email=student["_email"], password=student["_password"],
-                                  id=student["_id"], creation_time=student["_creation_time"])
-            if len(student["_existing_magic_skills"]) > 0:
-                student_ins.update_existing_skills(
-                    student["_existing_magic_skills"])
-            if len(student["_desired_magic_skills"]) > 0:
-                student_ins.update_desired_skills(
-                    student["_desired_magic_skills"])
+                                  id=student["_id"], image_url=student["_image_url"], creation_time=student["_creation_time"], existing_magic_skills=student["_existing_magic_skills"], desired_magic_skills=student["_desired_magic_skills"])
             students.append(student_ins.get_student_secure_data())
         return students
 
     def delete_student(self, student_id):
-        student = self._mongo.delete_student_by_id(student_id)
+        student = self._mySql.delete_student_by_id(student_id)
         return student
 
-    def persist_all_students(self):
-        students = {"students": self._students}
-        with open("data/students.json", "w") as write_file:
-            json.dump(students, write_file, cls=JsonEnc, indent=1)
-
-    def persist_all_admins(self):
-        admins = {"admins": self._admins}
-        with open("data/admins.json", "w") as write_file:
-            json.dump(admins, write_file, cls=JsonEnc, indent=1)
-
-    def load_students(self):
-        with open("data/students.json", "r") as read_file:
-            raw_data = json.load(read_file)
-            students_data = raw_data["students"]
-            for key in students_data:
-                student = Student(students_data[key]["_first_name"], students_data[key]["_last_name"], students_data[key]["_email"], students_data[key]
-                                  ["_password"], students_data[key]["_creation_time"], students_data[key]["_existing_magic_skills"], students_data[key]["_desired_magic_skills"])
-                self._students[students_data[key]["_email"]] = student
-
-    def load_admins(self):
-        with open("data/admins.json", "r") as read_file:
-            raw_data = json.load(read_file)
-            admins_data = raw_data["admins"]
-            for key in admins_data:
-                admin = Admin(admins_data[key]["_first_name"], admins_data[key]["_last_name"],
-                              admins_data[key]["_email"], admins_data[key]["_password"])
-                self._admins[admins_data[key]["_email"]] = admin
-
     def get_count_of_existing_skills(self, skill):
-        result = self._mongo.get_count_of_existing_skill(skill)
+        result = self._mySql.get_count_of_existing_skill(skill)
         return result
 
     def get_count_of_desired_skills(self, skill):
-        result = self._mongo.get_count_of_desired_skill(skill)
+        result = self._mySql.get_count_of_desired_skill(skill)
         return result
 
     def add_existing_skill_by_email(self, data):
@@ -132,7 +101,15 @@ class DataLayer:
         student.edit_update_time()
 
     def get_count_of_students_added_at_date(self, date):
-        result = self._mongo.get_count_of_students_added_at_date(date)
+        result = self._mySql.get_count_of_students_added_at_date(date)
+        return result
+
+    def get_most_recent_created_students(self):
+        result = self._mySql.get_most_recent_created_students()
+        return result
+
+    def get_most_recent_updated_students(self):
+        result = self._mySql.get_most_recent_updated_students()
         return result
 
     def shutdown(self):

@@ -73,7 +73,7 @@ def delete_student():
         if request_data is not None:
             admin_data = request_data["admin"]
             student_data = request_data["student"]
-            student_id = data_layer._mySql.get_students_id_by_email(
+            student_id = data_layer.get_student_id_by_email(
                 student_data["email"])
             try:
                 Validations.validate_admin(admin_data, data_layer)
@@ -83,10 +83,8 @@ def delete_student():
                 print(e)
                 return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=400,
                                           mimetype="application/json")
-            student = data_layer.delete_student(student_id[0])
+            student = data_layer.delete_student(student_id)
             return app.response_class(response=json.dumps({"message": "{} was deleted".format(student_data["email"]), "deleted": student}), status=200, mimetype="application/json")
-        return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
-                                  mimetype="application/json")
     except KeyError:
         return app.response_class(response=json.dumps({"message": "Student not found"}), status=404,
                                   mimetype="application/json")
@@ -149,12 +147,10 @@ def edit_student():
                 print(e)
                 return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=400,
                                           mimetype="application/json")
-
             student = data_layer.set_student_by_email(raw_data["data"])
             return app.response_class(response=json.dumps(student, cls=JsonEnc, indent=1), status=200, mimetype="application/json")
-        return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
-                                  mimetype="application/json")
-    except KeyError:
+    except KeyError as e:
+        print(e)
         return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=404,
                                   mimetype="application/json")
 

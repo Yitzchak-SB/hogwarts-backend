@@ -16,7 +16,7 @@ class MongoDataLayer(BaseDBLayer):
         students = list(students_data)
         return students
 
-    def get_student_by_email(self, email):
+    def get_student_and_skills_by_email(self, email):
         student = self.__db.students.find_one({"_email": email})
         return student
 

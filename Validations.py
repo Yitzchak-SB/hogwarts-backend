@@ -71,8 +71,8 @@ class Validations:
     def validate_admin(data, data_layer):
         try:
             email = data["_email"]
-            admin = data_layer._mongo.get_admin_by_email(email)
-            if data["_password"] != admin["_password"]:
+            admin = data_layer.get_admin_by_email(email)
+            if data["_password"] != admin.get_password():
                 raise ValueError("Admin not valid")
         except ValueError:
             print("Admin not valid")
@@ -82,8 +82,8 @@ class Validations:
     def validate_admin_login(data, data_layer):
         try:
             email = data["email"]
-            admin = data_layer._mongo.get_admin_by_email(email)
-            if data["password"] != admin["_password"]:
+            admin = data_layer.get_admin_by_email(email)
+            if data["password"] != admin.get_password():
                 raise ValueError("Admin not valid")
         except ValueError:
             print("Admin not valid")

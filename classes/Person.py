@@ -3,8 +3,8 @@ import uuid
 
 
 class Person:
-    def __init__(self, first_name, last_name, email, password, id=[], creation_time=False):
-        self._id = id
+    def __init__(self, first_name, last_name, email, password, _id=[], creation_time=[False]):
+        self._id = _id
         self._first_name = first_name
         self._last_name = last_name
         self._email = email

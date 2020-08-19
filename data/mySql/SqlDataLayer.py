@@ -2,6 +2,7 @@ import mysql.connector
 from decouple import config
 from data.BaseDBLayer import BaseDBLayer
 from data.mySql.Admins import Admins
+from data.mySql.Skills import Skills
 from data.mySql.Students import Students
 from data.mySql.StudentsSkills import StudentsSkills
 
@@ -11,8 +12,8 @@ class SqlDataLayer(BaseDBLayer):
         super().__init__()
 
     @staticmethod
-    def get_all_students():
-        initial_results = Students.get_all_students()
+    def get_all_students(term, index):
+        initial_results = Students.get_all_students(term, index)
         final_results = StudentsSkills.get_all_skills(initial_results)
         return final_results
 
@@ -30,7 +31,6 @@ class SqlDataLayer(BaseDBLayer):
 
     @staticmethod
     def edit_student_by_email(email, new_student_data):
-        print(new_student_data["_id"])
         Students.edit_student_by_email(email, new_student_data)
         return
 
@@ -57,6 +57,14 @@ class SqlDataLayer(BaseDBLayer):
     @staticmethod
     def get_count_of_desired_skill(skill):
         return StudentsSkills.get_count_of_desired_skill(skill)
+
+    @staticmethod
+    def get_count_of_existing_skill_by_level(skill, level):
+        return StudentsSkills.get_count_of_existing_skill_by_level(skill, level)
+
+    @staticmethod
+    def get_count_of_desired_skill_by_level(skill, level):
+        return StudentsSkills.get_count_of_desired_skill_by_level(skill, level)
 
     @staticmethod
     def get_count_of_students_added_at_date(date):
@@ -94,6 +102,14 @@ class SqlDataLayer(BaseDBLayer):
     @staticmethod
     def check_student_email_exists(email):
         return Students.check_student_email_exists(email)
+
+    @staticmethod
+    def get_all_magic_skills():
+        return Skills.get_all_magic_skills()
+
+    @staticmethod
+    def add_new_magic_skill(skill_data):
+        return Skills.add_new_magic_skill(skill_data)
 
     def shutdown(self):
         pass

@@ -9,13 +9,13 @@ class Students(SqlBase):
         super().__init__()
 
     @staticmethod
-    def get_all_students():
+    def get_all_students(term, index):
         try:
             connection = SqlBase._connect()
             cursor = connection.cursor()
-            search_all_students = "SELECT id, first_name, last_name, email, password, creation_time, last_updated, image_url  from students"
+            search_all_students = Students.get_search_term_by_order(term, index)
             results = []
-            cursor.execute(search_all_students)
+            cursor.execute(search_all_students,)
             for (id, first_name, last_name, email, password, creation_time, last_updated, image_url) in cursor:
                 results.append(
                     {"_id": id, "_first_name": first_name, "_last_name": last_name, "_email": email,
@@ -52,7 +52,6 @@ class Students(SqlBase):
         edit_data = "UPDATE students SET first_name=%s, last_name=%s, email=%s, image_url=%s, last_updated=%s WHERE email=%s"
         new_data = {"_first_name": new_student_data["_first_name"], "_last_name": new_student_data["_last_name"], "_email": new_student_data["_email"], "_last_updated": new_student_data["_last_update_time"], "_image_url": new_student_data["_image_url"]}
         SqlBase.edit_by_email(edit_data, email, new_data)
-        print(new_student_data)
         for skill in new_student_data["_desired_magic_skills"]:
             skill["type"] = "desired"
             StudentsSkills.add_skill_by_id(new_student_data["_id"], skill)
@@ -91,5 +90,14 @@ class Students(SqlBase):
         search = "SELECT COUNT(*) FROM students WHERE email=%s"
         return SqlBase.check_email_exists(search, email)
 
-
+    @staticmethod
+    def get_search_term_by_order(term, index):
+        if term == "date_asc":
+            return 'SELECT id, first_name, last_name, email, password, creation_time, last_updated, image_url  from students ORDER BY creation_time ASC LIMIT {}, 5'.format(int(index))
+        elif term == "date_desc":
+            return 'SELECT id, first_name, last_name, email, password, creation_time, last_updated, image_url  from students ORDER BY creation_time DESC LIMIT {}, 5'.format(int(index))
+        elif term == "name_asc":
+            return 'SELECT id, first_name, last_name, email, password, creation_time, last_updated, image_url  from students ORDER BY last_name ASC LIMIT {}, 5'.format(int(index))
+        elif term == "name_desc":
+            return 'SELECT id, first_name, last_name, email, password, creation_time, last_updated, image_url  from students ORDER BY last_name DESC LIMIT {}, 5'.format(int(index))
 

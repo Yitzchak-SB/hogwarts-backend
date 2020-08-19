@@ -61,6 +61,36 @@ class StudentsSkills(SqlBase):
             connection.close()
 
     @staticmethod
+    def get_count_of_existing_skill_by_level(skill, level):
+        try:
+            connection = SqlBase._connect()
+            cursor = connection.cursor()
+            search = "SELECT COUNT(*) FROM students_skills WHERE skill_type='existing' AND skill_name=%s AND skill_level=%s"
+            cursor.execute(search, (skill.replace(" ", "_"), level))
+            result = cursor.fetchone()
+            return {"result": result[0], "level": level}
+        except mysql.connector.Error as err:
+            print("Something went wrong: {}".format(err))
+        finally:
+            cursor.close()
+            connection.close()
+
+    @staticmethod
+    def get_count_of_desired_skill_by_level(skill, level):
+        try:
+            connection = SqlBase._connect()
+            cursor = connection.cursor()
+            search = "SELECT COUNT(*) FROM students_skills WHERE skill_type='desired' AND skill_name=%s AND skill_level=%s"
+            cursor.execute(search, (skill.replace(" ", "_"), level))
+            result = cursor.fetchone()
+            return {"result": result[0], "level": level}
+        except mysql.connector.Error as err:
+            print("Something went wrong: {}".format(err))
+        finally:
+            cursor.close()
+            connection.close()
+
+    @staticmethod
     def get_all_skills_by_id(id):
         desired_skills = StudentsSkills.get_desired_skills_by_id(id)
         existing_skills = StudentsSkills.get_existing_skills_by_id(id)
@@ -71,12 +101,12 @@ class StudentsSkills(SqlBase):
         try:
             connection = SqlBase._connect()
             cursor = connection.cursor()
-            search_desired_skills = "SELECT skill_name,skill_level from students_skills WHERE student_id=%s AND skill_type='desired'"
+            search_desired_skills = "SELECT ss.skill_name, ss.skill_level, s.num_of_levels from students_skills AS ss JOIN skills AS s ON ss.skill_name = s.skill_name AND ss.student_id=%s AND ss.skill_type='desired'"
             desired_skills = []
             cursor.execute(search_desired_skills,
                            (id,))
-            for (skill_name, skill_level) in cursor:
-                desired_skills.append({"name": skill_name, "level": skill_level})
+            for (skill_name, skill_level, num_of_levels) in cursor:
+                desired_skills.append({"name": skill_name, "level": skill_level, "num_of_levels": num_of_levels})
             return desired_skills
         except mysql.connector.Error as err:
             print("Something went wrong: {}".format(err))
@@ -89,12 +119,12 @@ class StudentsSkills(SqlBase):
         try:
             connection = SqlBase._connect()
             cursor = connection.cursor()
-            search_existing_skills = "SELECT skill_name,skill_level from students_skills WHERE student_id=%s AND skill_type='existing'"
+            search_existing_skills = "SELECT ss.skill_name, ss.skill_level, s.num_of_levels from students_skills AS ss JOIN skills AS s ON ss.skill_name = s.skill_name AND student_id=%s AND skill_type='existing'"
             existing_skills = []
             cursor.execute(search_existing_skills,
                            (id,))
-            for (skill_name, skill_level) in cursor:
-                existing_skills.append({"name": skill_name, "level": skill_level})
+            for (skill_name, skill_level, num_of_levels) in cursor:
+                existing_skills.append({"name": skill_name, "level": skill_level, "num_of_levels": num_of_levels})
             return existing_skills
         except mysql.connector.Error as err:
             print("Something went wrong: {}".format(err))

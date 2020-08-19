@@ -4,13 +4,13 @@ from classes.Skill import Skill
 
 
 class Student(Person):
-    def __init__(self, first_name, last_name, email, password, image_url, _id=[], creation_time=[], existing_magic_skills=[], desired_magic_skills=[]):
+    def __init__(self, first_name, last_name, email, password, image_url, existing_magic_skills=[], desired_magic_skills=[]):
         Person.__init__(self, first_name, last_name, email,
-                        password, _id, creation_time, )
+                        password)
         self._image_url = image_url
         self._existing_magic_skills = existing_magic_skills
         self._desired_magic_skills = desired_magic_skills
-        
+
     def set_image_url(self, image_url):
         self._image_url = image_url
 

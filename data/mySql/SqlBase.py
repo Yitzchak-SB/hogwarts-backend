@@ -44,7 +44,6 @@ class SqlBase:
             for (id, first_name, last_name, email, password, creation_time, last_updated, image_url) in cursor:
                 result = { "id": id, "first_name": first_name, "last_name": last_name, "email": email, "image_url": image_url, "creation_time": creation_time,
                      "last_updated": last_updated, "password": password}
-                print(result)
             return result
         except mysql.connector.Error as err:
             print("Something went wrong: {}".format(err))

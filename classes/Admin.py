@@ -2,9 +2,9 @@ from classes.Person import Person
 
 
 class Admin(Person):
-    def __init__(self, first_name, last_name, email, password, _id=[], creation_time=[]):
+    def __init__(self, first_name, last_name, email, password):
         Person.__init__(self, first_name, last_name, email,
-                        password, _id, creation_time)
+                        password)
 
     def get_new_admin(self):
         data = {"_first_name": self._first_name, "_last_name": self._last_name, "_email": self._email,

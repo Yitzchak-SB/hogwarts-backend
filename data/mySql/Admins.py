@@ -8,7 +8,7 @@ class Admins(SqlBase):
 
     @staticmethod
     def get_admin_by_email(email):
-        search = "SELECT first_name, last_name, email, password, id, creation_time, last_updated, image_url FROM admins WHERE email=%s"
+        search = "SELECT id, first_name, last_name, email, password, creation_time, last_updated, image_url FROM admins WHERE email=%s"
         return SqlBase.get_by_email(search, email)
 
     @staticmethod

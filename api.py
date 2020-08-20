@@ -62,6 +62,7 @@ def get_count_of_students_added_at_date():
 def add_new_student():
     try:
         request_data = request.json["data"]
+
         if request_data is not None:
             admin_data = request_data["admin"]
             student_data = request_data["student"]
@@ -127,8 +128,8 @@ def edit_student():
 def get_all_students():
     term = request.args.get("term")
     index = request.args.get("index")
-    students = data_layer.get_all_students(term, index)
-    return app.response_class(response=json.dumps({"students": students}), status=200, mimetype="application/json")
+    [students, row_count] = data_layer.get_all_students(term, index)
+    return app.response_class(response=json.dumps({"students": students, "row_count": row_count}), status=200, mimetype="application/json")
 
 
 @app.route("/students/")
@@ -229,8 +230,11 @@ def get_count_of_desired_skill():
 def get_count_of_existing_skill():
     skill = request.args.get("skill")
     level = request.args.get("level")
+    max_level = request.args.get("max_level")
     if level:
         count = data_layer.get_count_of_existing_skills_by_level(skill, level)
+    elif max_level:
+        count = data_layer.get_count_of_existing_skills_by_all_levels(skill, max_level)
     else:
         count = data_layer.get_count_of_existing_skills(skill)
     return app.response_class(response=json.dumps({skill: count}), status=200, mimetype="application/json")

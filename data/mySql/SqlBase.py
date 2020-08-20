@@ -45,7 +45,7 @@ class SqlBase:
                 result = { "id": id, "first_name": first_name, "last_name": last_name, "email": email, "image_url": image_url, "creation_time": creation_time,
                      "last_updated": last_updated, "password": password}
             return result
-        except mysql.connector.Error as err:
+        except Exception as err:
             print("Something went wrong: {}".format(err))
         finally:
             cursor.close()
@@ -58,7 +58,7 @@ class SqlBase:
             cursor = connection.cursor()
             connection.start_transaction()
             cursor.execute(set_term, (new_data["_first_name"], new_data["_last_name"],
-                                 new_data["_email"], new_data["_password"], new_data["_creation_time"]))
+                                 new_data["_email"], new_data["_password"], new_data["_image_url"], new_data["_creation_time"]))
             connection.commit()
             return cursor.lastrowid
         except mysql.connector.Error as err:
@@ -151,18 +151,16 @@ class SqlBase:
             cursor.close()
             connection.close()
 
+
     @staticmethod
-    def check_email_exists(search_term, email):
+    def get_count_of_rows_at_table(search_term):
         try:
             connection = SqlBase._connect()
             cursor = connection.cursor()
-            cursor.execute(search_term, (email,))
+            cursor.execute(search_term, ())
             result = cursor.fetchone()
-            if result[0] > 0:
-                raise ValueError("Email already Exits")
-            print(result)
-            return True
-        except mysql.connector.Error as err:
+            return result[0]
+        except Exception as err:
             print("Something went wrong: {}".format(err))
         finally:
             cursor.close()

@@ -54,10 +54,10 @@ class Students(SqlBase):
         SqlBase.edit_by_email(edit_data, email, new_data)
         for skill in new_student_data["_desired_magic_skills"]:
             skill["type"] = "desired"
-            StudentsSkills.add_skill_by_id(new_student_data["_id"], skill)
+            StudentsSkills.edit_skill_by_id(new_student_data["_id"], skill)
         for skill in new_student_data["_existing_magic_skills"]:
             skill["type"] = "existing"
-            StudentsSkills.add_skill_by_id(new_student_data["_id"], skill)
+            StudentsSkills.edit_skill_by_id(new_student_data["_id"], skill)
         return new_student_data
 
     @staticmethod
@@ -101,3 +101,8 @@ class Students(SqlBase):
         elif term == "name_desc":
             return 'SELECT id, first_name, last_name, email, password, creation_time, last_updated, image_url  from students ORDER BY last_name DESC LIMIT {}, 5'.format(int(index))
 
+    @staticmethod
+    def get_row_count_of_students():
+        count = "SELECT COUNT(*) FROM STUDENTS"
+        result = SqlBase.get_count_of_rows_at_table(count)
+        return result

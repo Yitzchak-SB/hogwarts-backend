@@ -82,6 +82,7 @@ class DataLayer:
 
     def get_all_students(self, term, index):
         students_data = self.__dataBase.get_all_students(term, index)
+        row_count = self.__dataBase.get_row_count_of_students()
         students = []
         for student in students_data:
             student_ins = Student(first_name=student["_first_name"], last_name=student["_last_name"], email=student["_email"], password=student["_password"],
@@ -89,7 +90,7 @@ class DataLayer:
             student_ins.set_creation_time(student["_creation_time"])
             student_ins.set_id(student["_id"])
             students.append(student_ins.get_student_secure_data())
-        return students
+        return [students, row_count]
 
     def delete_student(self, student_id):
         student = self.__dataBase.delete_student_by_id(student_id)
@@ -109,6 +110,22 @@ class DataLayer:
 
     def get_count_of_desired_skills_by_level(self, skill, level):
         result = self.__dataBase.get_count_of_desired_skill_by_level(skill, level)
+        return result
+
+    def get_count_of_existing_skills_by_all_levels(self, skill, max_level):
+        results = []
+        for level in range((int(max_level) + 1)):
+            result = self.__dataBase.get_count_of_existing_skill_by_level(skill, level)
+            results.append(result)
+        return results
+
+    def get_count_of_desired_skills_by_all_levels(self, skill, max_level):
+        results = []
+        for level in range((int(max_level+1))):
+            result = self.__dataBase.get_count_of_desired_skill_by_level(skill, level)
+            results.append(result)
+        return results
+
         return result
 
     def add_existing_skill_by_email(self, data):

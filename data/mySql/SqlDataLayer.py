@@ -24,6 +24,7 @@ class SqlDataLayer(BaseDBLayer):
     @staticmethod
     def get_student_and_skills_by_email(email):
         student_data = Students.get_student_by_email(email)
+        print(student_data)
         [existing_skills, desired_skills] = StudentsSkills.get_all_skills_by_id(student_data["id"])
         student_data["existing_magic_skills"] = existing_skills
         student_data["desired_magic_skills"] = desired_skills
@@ -110,6 +111,10 @@ class SqlDataLayer(BaseDBLayer):
     @staticmethod
     def add_new_magic_skill(skill_data):
         return Skills.add_new_magic_skill(skill_data)
+
+    @staticmethod
+    def get_row_count_of_students():
+        return Students.get_row_count_of_students()
 
     def shutdown(self):
         pass

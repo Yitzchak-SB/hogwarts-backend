@@ -137,7 +137,22 @@ class StudentsSkills(SqlBase):
         try:
             connection = SqlBase._connect()
             cursor = connection.cursor()
-            print(skill)
+            connection.start_transaction()
+            add = "INSERT INTO students_skills (skill_level, skill_name, skill_type, student_id) VALUES ('%s', %s, %s, '%s')"
+            cursor.execute(add, (skill["level"], skill["name"], skill["type"], id,))
+            connection.commit()
+        except Exception as err:
+            print("Something went wrong: {}".format(err))
+            connection.rollback()
+        finally:
+            cursor.close()
+            connection.close()
+
+    @staticmethod
+    def edit_skill_by_id(id, skill):
+        try:
+            connection = SqlBase._connect()
+            cursor = connection.cursor()
             add = "UPDATE students_skills SET skill_level=%s WHERE student_id=%s AND skill_name=%s AND skill_type=%s"
             cursor.execute(
                 add, (skill["level"], id, skill["name"], skill["type"],))

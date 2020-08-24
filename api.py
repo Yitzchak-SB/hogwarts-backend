@@ -1,16 +1,50 @@
 from flask import Flask, request, json
 from flask_cors import CORS
+from flask_jwt import JWT, jwt_required, current_identity
+from werkzeug.security import safe_str_cmp
+import atexit
 from data.DataLayer import DataLayer
 from Validations import Validations
 from data.JsonEnc import JsonEnc
-import atexit
+from data.mySql.Admins import Admins
+
+
+class User(object):
+    def __init__(self, id, username, password):
+        self.id = id
+        self.username = username
+        self.password = password
+
+    def __str__(self):
+        return "User(id='%s')" % self.id
+users = []
+admins = Admins.get_all_admins()
+for admin in admins:
+    users.append(User(admin["id"], admin["email"], admin["password"]))
+
+username_table = {u.username: u for u in users}
+userid_table = {u.id: u for u in users}
+
+def authenticate(username, password):
+    user = username_table.get(username, None)
+    if user and safe_str_cmp(user.password.encode('utf-8'), password.encode('utf-8')):
+        return user
+
+def identity(payload):
+    user_id = payload['identity']
+
+    return userid_table.get(user_id, None)
 
 app = Flask(__name__)
 cors = CORS(app)
 data_layer = DataLayer()
+app.config['SECRET_KEY'] = 'super-secret'
+jwt = JWT(app, authenticate, identity)
+
 
 
 @app.route("/student/<student_email>")
+@jwt_required()
 def get_student_by_email(student_email):
     try:
         Validations.validate_student_by_email(student_email)
@@ -26,6 +60,7 @@ def get_student_by_email(student_email):
 
 
 @app.route("/student-del", methods=["POST"])
+@jwt_required()
 def delete_student():
     try:
         request_data = request.json
@@ -50,6 +85,7 @@ def delete_student():
 
 
 @app.route("/student")
+@jwt_required()
 def get_count_of_students_added_at_date():
     date = request.args.get("date")
     date = date.replace("/", "_")
@@ -59,6 +95,7 @@ def get_count_of_students_added_at_date():
 
 
 @app.route("/student", methods=["POST"])
+@jwt_required()
 def add_new_student():
     try:
         request_data = request.json["data"]
@@ -83,6 +120,7 @@ def add_new_student():
 
 
 @app.route("/student/login", methods=["POST"])
+@jwt_required()
 def login_student():
     try:
         student_data = request.json
@@ -104,6 +142,7 @@ def login_student():
 
 
 @app.route("/student/edit", methods=["POST"])
+@jwt_required()
 def edit_student():
     try:
         raw_data = request.json
@@ -125,6 +164,7 @@ def edit_student():
 
 
 @app.route("/students")
+@jwt_required()
 def get_all_students():
     term = request.args.get("term")
     index = request.args.get("index")
@@ -133,6 +173,7 @@ def get_all_students():
 
 
 @app.route("/students/")
+@jwt_required()
 def get_students_by_added_date():
     try:
         date = request.args.get("date")
@@ -155,6 +196,7 @@ def get_students_by_added_date():
 
 
 @app.route("/updated")
+@jwt_required()
 def get_most_recent_updated_students():
     try:
         results = data_layer.get_most_recent_updated_students()
@@ -166,6 +208,7 @@ def get_most_recent_updated_students():
 
 
 @app.route("/created")
+@jwt_required()
 def get_most_recent_created_students():
     try:
         results = data_layer.get_most_recent_created_students()
@@ -176,6 +219,7 @@ def get_most_recent_created_students():
 
 
 @app.route("/admin", methods=["POST"])
+@jwt_required()
 def add_new_admin():
     try:
         admin_data = request.json
@@ -196,14 +240,17 @@ def add_new_admin():
 
 
 @app.route("/admin/login", methods=["POST"])
+@jwt_required()
 def login_admin():
     try:
         admin_data = request.json
+        print(admin_data)
         if admin_data is not None:
             try:
                 Validations.validate_admin_login(
                     admin_data, data_layer)
-                admin = data_layer.get_admin_by_email(admin_data["email"])
+                print(admin_data["username"])
+                admin = data_layer.get_admin_by_email(admin_data["username"])
             except ValueError as e:
                 print(e)
                 return app.response_class(response=json.dumps({"message": "Missing data for the request"}), status=400,
@@ -216,6 +263,7 @@ def login_admin():
                                   mimetype="application/json")
 
 @app.route("/desire")
+@jwt_required()
 def get_count_of_desired_skill():
     skill = request.args.get("skill")
     level = request.args.get("level")
@@ -227,6 +275,7 @@ def get_count_of_desired_skill():
 
 
 @app.route("/exist")
+@jwt_required()
 def get_count_of_existing_skill():
     skill = request.args.get("skill")
     level = request.args.get("level")
@@ -241,6 +290,7 @@ def get_count_of_existing_skill():
 
 
 @app.route("/desire", methods=["POST"])
+@jwt_required()
 def add_desired_skill():
     try:
         data = request.json
@@ -263,6 +313,7 @@ def add_desired_skill():
 
 
 @app.route("/exist", methods=["POST"])
+@jwt_required()
 def add_existing_skill():
     try:
         data = request.json
@@ -286,6 +337,7 @@ def add_existing_skill():
 
 
 @app.route("/skills")
+@jwt_required()
 def get_all_magic_skill():
     try:
         skills = data_layer.get_all_magic_skills()
@@ -297,6 +349,7 @@ def get_all_magic_skill():
 
 
 @app.route("/skills", methods=["POST"])
+@jwt_required()
 def add_new_magic_skill():
     try:
         skill_data = request.json

@@ -1,13 +1,12 @@
 import mysql.connector
 from decouple import config
-from data.BaseDBLayer import BaseDBLayer
 from data.mySql.Admins import Admins
 from data.mySql.Skills import Skills
 from data.mySql.Students import Students
 from data.mySql.StudentsSkills import StudentsSkills
 
 
-class SqlDataLayer(BaseDBLayer):
+class SqlDataLayer:
     def __init__(self):
         super().__init__()
 

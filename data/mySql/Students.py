@@ -1,5 +1,5 @@
 import mysql.connector
-
+from data.mySql.context import get_cursor
 from data.mySql.SqlBase import SqlBase
 from data.mySql.StudentsSkills import StudentsSkills
 
@@ -10,9 +10,7 @@ class Students(SqlBase):
 
     @staticmethod
     def get_all_students(term, index):
-        try:
-            connection = SqlBase._connect()
-            cursor = connection.cursor()
+        with get_cursor(SqlBase._connect()) as cursor:
             search_all_students = Students.get_search_term_by_order(term, index)
             results = []
             cursor.execute(search_all_students,)
@@ -22,12 +20,8 @@ class Students(SqlBase):
                      "_password": password, "_creation_time": creation_time, "_last_updated": last_updated,
                      "_image_url": image_url})
             return results
-        except mysql.connector.Error as err:
-            print("Something went wrong: {}".format(err))
-        finally:
-            if connection.is_connected():
-                cursor.close()
-                connection.close()
+
+
 
     @staticmethod
     def get_student_by_email(email):

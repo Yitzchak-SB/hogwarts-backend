@@ -1,5 +1,5 @@
-import mysql.connector
 from data.mySql.SqlBase import SqlBase
+from data.mySql.context import get_cursor
 
 
 class Admins(SqlBase):
@@ -20,4 +20,15 @@ class Admins(SqlBase):
     def delete_admin_by_id(id):
         delete = "DELETE FROM admins WHERE id=%s"
         return SqlBase.delete_by_id("admins", delete, id)
+
+    @staticmethod
+    def get_all_admins():
+        with get_cursor(SqlBase._connect()) as cursor:
+            admins = []
+            search = "SELECT id, email, password FROM admins"
+            cursor.execute(search,)
+            for (id, email, password) in cursor:
+                admin = {"id": id,"email": email, "password": password}
+                admins.append(admin)
+            return admins
 

@@ -31,7 +31,7 @@ class DataLayer:
     def get_admin_by_email(self, email):
         admin_data = self.__dataBase.get_admin_by_email(email)
         admin = Admin(first_name=admin_data["first_name"], last_name=admin_data["last_name"], email=admin_data["email"],
-                      password=admin_data["password"])
+                      password=admin_data["password"], image_url=admin_data["image_url"])
         admin.set_id(admin_data["id"])
         admin.set_creation_time(admin_data["creation_time"])
         return admin

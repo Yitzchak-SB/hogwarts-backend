@@ -81,7 +81,7 @@ class Validations:
     @staticmethod
     def validate_admin_login(data, data_layer):
         try:
-            email = data["email"]
+            email = data["username"]
             admin = data_layer.get_admin_by_email(email)
             if data["password"] != admin.get_password():
                 raise ValueError("Admin not valid")
